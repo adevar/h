@@ -1,4 +1,4 @@
-.search-result-sidebar {
+search-result-sidebar {
   width: $search-result-sidebar-width;
   flex-shrink: 0;
   margin-bottom: 40px;
@@ -6,7 +6,11 @@
 
 .search-result-sidebar__title {
   margin-top: 0;
-  margin-bottom: 26px;
+  margin-bottom: 14px;
+}
+
+.search-result-sidebar__subtitle {
+  margin-bottom: 5px;
 }
 
 .search-result-sidebar__title,
@@ -19,16 +23,24 @@
 }
 
 .search-result-sidebar__section {
-  margin-bottom: 26px;
+  margin-bottom: 2em;
   @include pie-clearfix;
 }
 
-.search-result-sidebar__section:last-child {
+.search-result-sidebar__details-section p {
+  margin-top: 0;
+  margin-bottom: 7px;
+}
+
+.search-result-sidebar__share-link {
+  margin-top: 7px;
+  padding-top: 5px;
   margin-bottom: 0;
 }
 
 .search-result-sidebar__section p:first-of-type {
   margin-top: 0;
+  margin-bottom: 0;
 }
 
 .search-result-sidebar__section p:last-of-type {
@@ -40,11 +52,23 @@
   float: left;
   clear: left;
   margin-right: 3px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.search-result-sidebar__dt-link {
+  float: left;
+  clear: left;
+  margin-right: 3px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .search-result-sidebar__dd {
   float: left;
   margin-left: 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .search-result-sidebar-title__annotations-count {
@@ -53,6 +77,10 @@
 }
 
 .search-result-sidebar__annotations-count {
+  color: $grey-4;
+}
+
+.search-result-sidebar__creator {
   color: $grey-5;
 }
 
@@ -60,7 +88,6 @@
   display: flex;
   flex-wrap: wrap;
   max-width: 350px;
-  margin-top: 30px;
 }
 
 .search-result-sidebar__tag {
@@ -74,6 +101,7 @@
 }
 
 .search-result-sidebar__tag-container {
+  color: $grey-6;
   display: flex;
 }
 
@@ -88,6 +116,8 @@
   font-weight: bold;
   margin-right: 3px;
   margin-bottom: 7px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 @media screen and (max-width: $tablet-width + 250px) {
