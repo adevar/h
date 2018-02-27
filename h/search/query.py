@@ -6,7 +6,7 @@ from h.util import uri
 LIMIT_DEFAULT = 20
 LIMIT_MAX = 200
 
-branches = [False]*3
+branches = [False]*34
 
 class Builder(object):
 
@@ -20,16 +20,20 @@ class Builder(object):
         self.aggregations = []
 
     def append_filter(self, f):
+        branches[0] = True
         self.filters.append(f)
 
     def append_matcher(self, m):
+        branches[1] = True
         self.matchers.append(m)
 
     def append_aggregation(self, a):
+        branches[2] = True
         self.aggregations.append(a)
 
     def build(self, params):
         """Get the resulting query object from this query builder."""
+        branches[3] = True
         params = params.copy()
 
         p_from = extract_offset(params)
@@ -44,14 +48,17 @@ class Builder(object):
 
         # Remaining parameters are added as straightforward key-value matchers
         for key, value in params.items():
+            branches[4] = True
             matchers.append({"match": {key: value}})
 
         query = {"match_all": {}}
 
         if matchers:
+            branches[5] = True
             query = {"bool": {"must": matchers}}
 
         if filters:
+            branches[6] = True
             query = {
                 "filtered": {
                     "filter": {"and": filters},
@@ -69,6 +76,7 @@ class Builder(object):
 
 
 def extract_offset(params):
+    branches[7] = True
     try:
         val = int(params.pop("offset"))
         if val < 0:
@@ -80,6 +88,7 @@ def extract_offset(params):
 
 
 def extract_limit(params):
+    branches[8] = True
     try:
         val = int(params.pop("limit"))
         val = min(val, LIMIT_MAX)
@@ -92,6 +101,7 @@ def extract_limit(params):
 
 
 def extract_sort(params):
+    branches[9] = True
     return [{
         params.pop("sort", "updated"): {
             "ignore_unmapped": True,
@@ -105,6 +115,7 @@ class TopLevelAnnotationsFilter(object):
     """Matches top-level annotations only, filters out replies."""
 
     def __call__(self, _):
+        branches[10] = True
         return {'missing': {'field': 'references'}}
 
 
@@ -118,6 +129,7 @@ class AuthorityFilter(object):
         self.authority = authority
 
     def __call__(self, params):
+        branches[11] = True
         return {'term': {'authority': self.authority}}
 
 
@@ -139,10 +151,12 @@ class AuthFilter(object):
         self.request = request
 
     def __call__(self, params):
+        branches[12] = True
         public_filter = {'term': {'shared': True}}
 
         userid = self.request.authenticated_userid
         if userid is None:
+            branches[13] = True
             return public_filter
 
         return {'or': [
@@ -160,8 +174,10 @@ class GroupFilter(object):
     def __call__(self, params):
         # Remove parameter if passed, preventing fall-through to default query
         group = params.pop("group", None)
+        branches[14] = True
 
         if group is not None:
+            branches[15] = True
             return {"term": {"group": group}}
 
 
@@ -180,16 +196,21 @@ class UriFilter(object):
         self.request = request
 
     def __call__(self, params):
+        branches[16] = True
         if 'uri' not in params and 'url' not in params:
+            branches[17] = True
             return None
         query_uris = [v for k, v in params.items() if k in ['uri', 'url']]
         if 'uri' in params:
+            branches[18] = True
             del params['uri']
         if 'url' in params:
+            branches[19] = True
             del params['url']
 
         uris = set()
         for query_uri in query_uris:
+            branches[20] = True
             expanded = storage.expand_uri(self.request.db, query_uri)
 
             us = [uri.normalize(u) for u in expanded]
@@ -205,7 +226,9 @@ class UserFilter(object):
     """
 
     def __call__(self, params):
+        branches[21] = True
         if 'user' not in params:
+            branches[22] = True
             return None
 
         users = [v.lower() for k, v in params.items() if k == 'user']
@@ -224,6 +247,7 @@ class DeletedFilter(object):
     """
 
     def __call__(self, _):
+        branches[23] = True
         return {"bool": {"must_not": {"exists": {"field": "deleted"}}}}
 
 
@@ -234,7 +258,9 @@ class AnyMatcher(object):
     """
 
     def __call__(self, params):
+        branches[24] = True
         if "any" not in params:
+            branches[25] = True
             return None
         qs = ' '.join([v for k, v in params.items() if k == "any"])
         result = {
@@ -252,6 +278,7 @@ class TagsMatcher(object):
     """Matches the tags field against 'tag' or 'tags' parameters."""
 
     def __call__(self, params):
+        branches[26] = True
         tags = set(v for k, v in params.items() if k in ['tag', 'tags'])
         try:
             del params['tag']
@@ -271,6 +298,7 @@ class RepliesMatcher(object):
         self.annotation_ids = ids
 
     def __call__(self, _):
+        branches[27] = True
         return {
             'terms': {'references': self.annotation_ids}
         }
@@ -282,6 +310,7 @@ class TagsAggregation(object):
         self.limit = limit
 
     def __call__(self, _):
+        branches[28] = True
         return {
             "terms": {
                 "field": "tags_raw",
@@ -290,7 +319,9 @@ class TagsAggregation(object):
         }
 
     def parse_result(self, result):
+        branches[29] = True
         if not result:
+            branches[30] = True
             return {}
 
         return [
@@ -305,6 +336,7 @@ class UsersAggregation(object):
         self.limit = limit
 
     def __call__(self, _):
+        branches[31] = True
         return {
             "terms": {
                 "field": "user_raw",
@@ -313,7 +345,9 @@ class UsersAggregation(object):
         }
 
     def parse_result(self, result):
+        branches[32] = True
         if not result:
+            branches[33] = True
             return {}
 
         return [
