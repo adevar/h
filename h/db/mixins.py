@@ -8,7 +8,6 @@ import datetime
 
 import sqlalchemy as sa
 
-
 class Timestamps(object):
     created = sa.Column(sa.DateTime,
                         default=datetime.datetime.utcnow,

@@ -17,6 +17,7 @@ from h.i18n import TranslationString as _  # noqa
 class UserNotFoundError(Exception):
     pass
 
+branches = [False]*3
 
 @view_config(route_name='admin_users',
              request_method='GET',

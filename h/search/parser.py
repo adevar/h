@@ -12,6 +12,8 @@ from collections import namedtuple
 import pyparsing as pp
 from webob.multidict import MultiDict
 
+branches = [False]*3
+
 # Enable memoizing of the parsing logic
 pp.ParserElement.enablePackrat()
 

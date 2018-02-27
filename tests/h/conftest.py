@@ -23,6 +23,9 @@ from h import db
 from h.settings import database_url
 from h._compat import text_type
 
+from h import search    #PROPER IMPORT
+from h import views #
+
 TEST_AUTHORITY = u'example.com'
 TEST_DATABASE_URL = database_url(os.environ.get('TEST_DATABASE_URL',
                                                 'postgresql://postgres@localhost/htest'))
@@ -252,3 +255,48 @@ def pyramid_settings():
     return {
         'sqlalchemy.url': TEST_DATABASE_URL
     }
+
+@pytest.fixture(autouse=True)
+def coverageFix():
+    result = [[0.,0.],[0.,0.],[0.,0.],[0.,0.]]
+
+    #create loop for the module, counting the trues in the data structure MUST IMPORT PROPER FILE
+    #must create data strcuture in each file
+
+    for element in search.client.branches:  #search/client.py (branches is data structure)
+        if element == True:
+            result[0][0] += 1.
+        result[0][1] += 1.
+
+    for element in search.parser.branches:
+        if element == True:
+            result[1][0] += 1.
+        result[1][1] += 1.
+
+    for element in search.index.branches:
+        if element == True:
+            result[2][0] += 1.
+        result[2][1] += 1.
+
+    for element in search.query.branches:
+        if element == True:
+            result[3][0] += 1.
+        result[3][1] += 1.
+
+    trues = 0.
+    falses = 0.
+
+    for element in result:
+        trues += element[0]
+        falses += element[1]
+
+    falses = (trues/falses)*100
+
+    print('===============================================')
+    print('Test coverage for client.py is {0}%'.format(int((result[0][0]/result[0][1])*100)))
+    print('Test coverage for parser.py is {0}%'.format(int((result[1][0]/result[1][1])*100)))
+    print('Test coverage for index.py is {0}%'.format(int((result[2][0]/result[2][1])*100)))
+    print('Test coverage for query.py is {0}%'.format(int((result[3][0]/result[3][1])*100)))
+
+    print('Total test coverage is {0}%'.format(int(falses)))
+    

@@ -21,6 +21,8 @@ log = logging.getLogger(__name__)
 ES_CHUNK_SIZE = 100
 PG_WINDOW_SIZE = 2000
 
+branches = [False]*3
+
 
 class Window(namedtuple('Window', ['start', 'end'])):
     pass

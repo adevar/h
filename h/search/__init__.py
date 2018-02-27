@@ -5,7 +5,9 @@ from h.search.config import init
 from h.search.core import Search
 from h.search.core import FILTERS_KEY
 from h.search.core import MATCHERS_KEY
-
+import parser
+import index
+import query
 __all__ = (
     'Search',
     'get_client',
