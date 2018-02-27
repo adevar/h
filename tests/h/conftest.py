@@ -23,8 +23,7 @@ from h import db
 from h.settings import database_url
 from h._compat import text_type
 
-from h import search    #PROPER IMPORT
-from h import views #
+from h import search    #PROPER IMPORT for search module
 
 TEST_AUTHORITY = u'example.com'
 TEST_DATABASE_URL = database_url(os.environ.get('TEST_DATABASE_URL',
@@ -258,7 +257,7 @@ def pyramid_settings():
 
 @pytest.fixture(autouse=True)
 def coverageFix():
-    result = [[0.,0.],[0.,0.],[0.,0.],[0.,0.]]
+    result = [[0.,0.],[0.,0.],[0.,0.],[0.,0.]]      #result data structure
 
     #create loop for the module, counting the trues in the data structure MUST IMPORT PROPER FILE
     #must create data strcuture in each file
@@ -268,17 +267,17 @@ def coverageFix():
             result[0][0] += 1.
         result[0][1] += 1.
 
-    for element in search.parser.branches:
+    for element in search.parser.branches:  #search/parser.py
         if element == True:
             result[1][0] += 1.
         result[1][1] += 1.
 
-    for element in search.index.branches:
+    for element in search.index.branches:   #search/index.py
         if element == True:
             result[2][0] += 1.
         result[2][1] += 1.
 
-    for element in search.query.branches:
+    for element in search.query.branches:   #search/query.py
         if element == True:
             result[3][0] += 1.
         result[3][1] += 1.
@@ -286,7 +285,7 @@ def coverageFix():
     trues = 0.
     falses = 0.
 
-    for element in result:
+    for element in result:                  #count all trues and total branches
         trues += element[0]
         falses += element[1]
 
