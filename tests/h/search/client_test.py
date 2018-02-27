@@ -8,7 +8,6 @@ from elasticsearch import RequestsHttpConnection
 
 from h.search.client import get_client
 
-
 class TestClient(object):
     pass
 
