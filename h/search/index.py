@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 ES_CHUNK_SIZE = 100
 PG_WINDOW_SIZE = 2000
 
-branches = [False]*3
+branches = [False]*21
 
 
 class Window(namedtuple('Window', ['start', 'end'])):
@@ -48,11 +48,15 @@ def index(es, annotation, request, target_index=None):
     presenter = presenters.AnnotationSearchIndexPresenter(annotation)
     annotation_dict = presenter.asdict()
 
+    branches[0] = True
+
     event = AnnotationTransformEvent(request, annotation, annotation_dict)
     request.registry.notify(event)
 
     if target_index is None:
         target_index = es.index
+
+        branches[1] = True
 
     es.conn.index(
         index=target_index,
@@ -81,8 +85,12 @@ def delete(es, annotation_id, target_index=None):
     :type target_index: unicode
     """
 
+    branches[2] = True
+
     if target_index is None:
         target_index = es.index
+
+        branches[3] = True
 
     es.conn.index(
         index=target_index,
@@ -119,10 +127,15 @@ class BatchIndexer(object):
         :returns: a set of errored ids
         :rtype: set
         """
+
+        branches[4] = True
+
         if not annotation_ids:
+            branches[5] = True
             annotations = _all_annotations(session=self.session,
                                            windowsize=PG_WINDOW_SIZE)
         else:
+            branches[6] = True
             annotations = _filtered_annotations(session=self.session,
                                                 ids=annotation_ids)
 
@@ -135,17 +148,21 @@ class BatchIndexer(object):
                                              expand_action_callback=self._prepare)
         errored = set()
         for ok, item in indexing:
+            branches[7] = True
             if not ok:
+                branches[8] = True
                 status = item[self.op_type]
 
                 was_doc_exists_err = 'document already exists' in status['error']
                 if self.op_type == 'create' and was_doc_exists_err:
+                    branches[9] = True
                     continue
 
                 errored.add(status['_id'])
         return errored
 
     def _prepare(self, annotation):
+        branches[10] = True
         action = {self.op_type: {'_index': self._target_index,
                                  '_type': self.es_client.t.annotation,
                                  '_id': annotation.id}}
@@ -162,6 +179,7 @@ def _all_annotations(session, windowsize=2000):
     # It is the most performant way of loading a big set of records from
     # the database while still supporting eagerloading of associated
     # document data.
+    branches[11] = True
     windows = column_windows(session=session,
                              column=models.Annotation.updated,  # implicit ASC
                              windowsize=windowsize,
@@ -169,26 +187,32 @@ def _all_annotations(session, windowsize=2000):
     query = _eager_loaded_annotations(session).filter(_annotation_filter())
 
     for window in windows:
+        branches[12] = True
         for a in query.filter(window):
+            branches[13] = True
             yield a
 
 
 def _filtered_annotations(session, ids):
+    branches[14] = True
     annotations = (_eager_loaded_annotations(session)
                    .execution_options(stream_results=True)
                    .filter(_annotation_filter())
                    .filter(models.Annotation.id.in_(ids)))
 
     for a in annotations:
+        branches[15] = True
         yield a
 
 
 def _annotation_filter():
     """Default filter for all search indexing operations."""
+    branches[16] = True
     return sa.not_(models.Annotation.deleted)
 
 
 def _eager_loaded_annotations(session):
+    branches[17] = True
     return session.query(models.Annotation).options(
         subqueryload(models.Annotation.document).subqueryload(models.Document.document_uris),
         subqueryload(models.Annotation.document).subqueryload(models.Document.meta),
@@ -198,12 +222,15 @@ def _eager_loaded_annotations(session):
 
 
 def _log_status(stream, log_every=1000):
+    branches[18] = True
     i = 0
     then = time.time()
     for item in stream:
+        branches[19] = True
         yield item
         i += 1
         if i % log_every == 0:
+            branches[20] = True
             now = time.time()
             delta = now - then
             then = now

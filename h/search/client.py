@@ -37,15 +37,18 @@ class Client(object):
 
 def get_client(settings):
     """Return a client for the Elasticsearch index."""
+
+    branches[0] = True
+
     host = settings['es.host']
     index = settings['es.index']
     kwargs = {}
     kwargs['max_retries'] = settings.get('es.client.max_retries', 3)
     kwargs['retry_on_timeout'] = settings.get('es.client.retry_on_timeout', False)
     kwargs['timeout'] = settings.get('es.client.timeout', 10)
-    branches[0] = True
     if 'es.client_poolsize' in settings:
         kwargs['maxsize'] = settings['es.client_poolsize']
+        
         branches[1] = True
 
     have_aws_creds = ('es.aws.access_key_id' in settings and
@@ -59,6 +62,7 @@ def get_client(settings):
                         'es')
         kwargs['http_auth'] = auth
         kwargs['connection_class'] = RequestsHttpConnection
+        
         branches[2] = True
 
     return Client(host, index, **kwargs)
