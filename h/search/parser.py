@@ -12,7 +12,7 @@ from collections import namedtuple
 import pyparsing as pp
 from webob.multidict import MultiDict
 
-branches = [False]*3
+branches = [False]*16
 
 # Enable memoizing of the parsing logic
 pp.ParserElement.enablePackrat()
@@ -69,6 +69,7 @@ def parse(q):
     Supported keys for fields are ``user``, ``group``, ``tag``, ``uri``.
     Any other search terms will get the key ``any``.
     """
+    branches[0] = True
     parser = _get_parser()
     parse_results = parser.parseString(q)
 
@@ -86,25 +87,32 @@ def unparse(q):
     function, as it can be used to transform the MultiDict returned from that
     function back into a string query.
     """
+    branches[1] = True
     terms = []
 
     for key, val in q.items():
+        branches[2] = True
         if key == 'any':
+            branches[3] = True
             terms.append(_escape_term(val))
         else:
+            branches[4] = True
             terms.append('{key}:{val}'.format(key=key, val=_escape_term(val)))
 
     return ' '.join(terms)
 
 
 def _get_parser():
+    branches[5] = True
     global parser
     if parser is None:
+        branches[6] = True
         parser = _make_parser()
     return parser
 
 
 def _make_parser():
+    branches[7] = True
     word = pp.CharsNotIn(''.join(whitespace))
     word.skipWhitespace = True
 
@@ -117,6 +125,7 @@ def _make_parser():
     expressions = []
 
     for field in named_fields:
+        branches[8] = True
         exp = pp.Suppress(pp.CaselessLiteral(field) + ':') + \
             value.copy().setParseAction(_decorate_match(field))
         expressions.append(exp)
@@ -129,23 +138,30 @@ def _make_parser():
 
 def _decorate_match(key):
     def parse_action_impl(t):
+        branches[9] = True
         return Match(key, t[0])
     return parse_action_impl
 
 
 def _escape_term(term):
     # Only surround with quotes if the term contains whitespace
+    branches[10] = True
     if whitespace.intersection(term):
+        branches[11] = True
         # Originally double quoted and contained escaped double quotes
         if '\\"' in term:
+            branches[12] = True
             return '"' + term + '"'
         # Originally single quoted and contained escaped single quotes
         elif "\\'" in term:
+            branches[13] = True
             return "'" + term + "'"
         # Contains unescaped single quotes, so easiest to double quote
         elif "'" in term:
+            branches[14] = True
             return '"' + term + '"'
         # None of the above: prefer single quotes
         else:
+            branches[15] = True
             return "'" + term + "'"
     return term
